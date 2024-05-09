@@ -203,11 +203,16 @@ class TritonPythonModel:
                                             np.array(end_id, dtype=np.int32))
             pad_id_tensor = pb_utils.Tensor('OUT_PAD_ID',
                                             np.array(pad_id, dtype=np.int32))
+            suppress_token_ids = pb_utils.Tensor('SUPPRESS_TOKEN_IDS',
+                                                 np.array([[324, 325, 326, 327, 328]], dtype=np.int32))
+            suppress_token_scales = pb_utils.Tensor('SUPPRESS_TOKEN_SCALES',
+                                                    np.array([[0.01, 0.12, 0.31, 0.03, 0.11]], dtype=np.float32))
 
             inference_response = pb_utils.InferenceResponse(output_tensors=[
                 input_id_tensor, bad_words_ids_tensor, stop_words_ids_tensor,
                 request_input_len_tensor, request_output_len_tensor,
-                embedding_bias_tensor, end_id_tensor, pad_id_tensor
+                embedding_bias_tensor, end_id_tensor, pad_id_tensor,
+                suppress_token_ids, suppress_token_scales
             ])
             responses.append(inference_response)
 

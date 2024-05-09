@@ -56,6 +56,8 @@ class TritonDecoder(Decoder):
             "EMBEDDING_BIAS",
             "OUT_PAD_ID",
             "OUT_END_ID",
+            "SUPPRESS_TOKEN_IDS",
+            "SUPPRESS_TOKEN_SCALES",
         ]
 
         self._llm_outputs = [
@@ -179,6 +181,8 @@ class TritonDecoder(Decoder):
             if target_name is None:
                 # explicitly ignore this triton input
                 continue
+
+            print("target_name: ", target_name, flush=True)
             if not hasattr(response, target_name):
                 raise AttributeError(
                     f"response object has not attribute '{target_name}'")
@@ -224,6 +228,8 @@ class TritonDecoder(Decoder):
             "embedding_bias_weights": "EMBEDDING_BIAS_WEIGHTS",
             "pad_id": "PAD_ID",
             "end_id": "END_ID",
+            # "suppress_token_ids": "SUPPRESS_TOKEN_IDS",
+            # "suppress_token_scales": "SUPPRESS_TOKEN_SCALES"
         }
         return self.create_triton_tensors(request, name_map)
 
@@ -235,7 +241,8 @@ class TritonDecoder(Decoder):
             "STOP_WORDS_IDS": "stop_words_list",
             "EMBEDDING_BIAS": "embedding_bias",
             "OUT_PAD_ID": "pad_id",
-            "OUT_END_ID": "end_id",
+            "SUPPRESS_TOKEN_IDS": "suppress_token_ids",
+            "SUPPRESS_TOKEN_SCALES": "suppress_token_scales",
         }
         return self.convert_triton_response(triton_output, PreprocResponse,
                                             name_map)
@@ -279,6 +286,7 @@ class TritonDecoder(Decoder):
     ) -> GenerationResponse:
         input_tensors = self._get_llm_tensors(preproc, request, None,
                                               draft_request)
+        print(">>> _get_llm_tensors: ", input_tensors)
         triton_req = pb_utils.InferenceRequest(
             model_name=self.llm_model_name,
             inputs=input_tensors,
@@ -309,6 +317,8 @@ class TritonDecoder(Decoder):
             "embedding_bias": "embedding_bias",
             "pad_id": "pad_id",
             "end_id": "end_id",
+            "suppress_token_ids": "suppress_token_ids",
+            "suppress_token_scales": "suppress_token_scales"
         }
         return self.create_triton_tensors(preproc, name_map)
 

@@ -26,10 +26,10 @@
 
 name: "tensorrt_llm_bls"
 backend: "python"
-max_batch_size: ${triton_max_batch_size}
+max_batch_size: 2
 
 model_transaction_policy {
-  decoupled: ${decoupled_mode}
+  decoupled: false
 }
 
 input [
@@ -229,7 +229,7 @@ parameters: {
 parameters: {
   key: "tensorrt_llm_model_name"
   value: {
-    string_value: "${tensorrt_llm_model_name}"
+    string_value: "tensorrt_llm"
   }
 }
 parameters: {
@@ -241,7 +241,7 @@ parameters: {
 
 instance_group [
   {
-    count: ${bls_instance_count}
+    count: 2
     kind : KIND_CPU
   }
 ]

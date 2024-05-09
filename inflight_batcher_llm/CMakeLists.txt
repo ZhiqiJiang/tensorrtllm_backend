@@ -24,6 +24,9 @@
 cmake_minimum_required(VERSION 3.17)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/set_ifndef.cmake)
 
+set(ENV{http_proxy} "socks5://127.0.0.1:1080")
+set(ENV{https_proxy} "socks5://127.0.0.1:1080")
+
 set(TRITON_BUILD
     OFF
     CACHE STRING "Using Triton build process")
@@ -104,7 +107,8 @@ configure_file(src/libtriton_tensorrtllm.ldscript
 
 set(COMMON_SRCS
     src/work_item.cc src/work_items_queue.cc src/model_instance_state.cc
-    src/model_state.cc src/utils.cc src/inference_answer.cc)
+    src/model_state.cc src/utils.cc src/inference_answer.cc src/logits_processor.h
+        )
 
 add_library(triton-tensorrt-llm-common SHARED ${COMMON_SRCS})
 
@@ -310,10 +314,13 @@ target_link_libraries(triton-tensorrt-llm-backend
                       PRIVATE triton-tensorrt-llm-common)
 target_link_libraries(triton-tensorrt-llm-worker
                       PRIVATE triton-tensorrt-llm-common)
-
+unset(ENV{http_proxy})
+unset(ENV{https_proxy})
+# https://gitee.com/imagg/nlohmann--json.git
+# https://github.com/nlohmann/json.git
 FetchContent_Declare(
   json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_REPOSITORY https://gitee.com/imagg/nlohmann--json.git
   GIT_TAG v3.11.2)
 
 FetchContent_MakeAvailable(json)

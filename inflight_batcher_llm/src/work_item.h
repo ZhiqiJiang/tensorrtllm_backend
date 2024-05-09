@@ -30,7 +30,11 @@
 #include "triton/backend/backend_common.h"
 #include "triton/core/tritonbackend.h"
 #include "triton/core/tritonserver.h"
+#include "logits_processor.h"
 #include <unordered_set>
+
+using namespace triton::backend::soul_strategy;
+
 
 namespace triton::backend::inflight_batcher_llm
 {

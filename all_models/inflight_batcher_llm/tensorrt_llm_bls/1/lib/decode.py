@@ -122,6 +122,8 @@ class PreprocResponse:
     embedding_bias: Optional[np.ndarray] = None
     end_id: Optional[np.ndarray] = None
     pad_id: Optional[np.ndarray] = None
+    suppress_token_ids: Optional[np.ndarray] = None
+    suppress_token_scales: Optional[np.ndarray] = None
 
     @classmethod
     def with_new_inputs(cls,
@@ -137,6 +139,8 @@ class PreprocResponse:
             stop_words_list=other.stop_words_list,
             end_id=other.end_id,
             pad_id=other.pad_id,
+            suppress_token_ids=other.suppress_token_ids,
+            suppress_token_scales=other.suppress_token_scales,
         )
 
 

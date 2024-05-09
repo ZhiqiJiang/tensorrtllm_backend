@@ -26,16 +26,12 @@
 
 name: "tensorrt_llm"
 backend: "tensorrtllm"
-max_batch_size: ${triton_max_batch_size}
+max_batch_size: 2
 
 model_transaction_policy {
-  decoupled: ${decoupled_mode}
+  decoupled: false
 }
 
-dynamic_batching {
-    preferred_batch_size: [ ${triton_max_batch_size} ]
-    max_queue_delay_microseconds: ${max_queue_delay_microseconds}
-}
 
 input [
   {
@@ -262,6 +258,18 @@ input [
 	dims: [ -1, 3 ]
 	optional: true
 	allow_ragged_batch: true
+  },
+  {
+    name: "suppress_token_ids"
+	data_type: TYPE_INT32
+	dims: [ -1 ]
+	optional: true
+  },
+  {
+    name: "suppress_token_scales"
+	data_type: TYPE_FP32
+	dims: [ -1 ]
+	optional: true
   }
 ]
 output [
@@ -317,13 +325,13 @@ parameters: {
 parameters: {
   key: "gpt_model_type"
   value: {
-    string_value: "${batching_strategy}"
+    string_value: "inflight_fused_batching"
   }
 }
 parameters: {
   key: "gpt_model_path"
   value: {
-    string_value: "${engine_dir}"
+    string_value: "/root/triton_model_repo/tensorrt_llm/1/"
   }
 }
 parameters: {
@@ -341,7 +349,7 @@ parameters: {
 parameters: {
   key: "batch_scheduler_policy"
   value: {
-    string_value: "${batch_scheduler_policy}"
+    string_value: "guaranteed_no_evict"
   }
 }
 parameters: {

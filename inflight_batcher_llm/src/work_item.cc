@@ -31,6 +31,7 @@
 
 #include <map>
 
+
 namespace triton::backend::inflight_batcher_llm
 {
 
@@ -132,6 +133,7 @@ std::shared_ptr<tensorrt_llm::batch_manager::InferenceRequest> WorkItem::createI
         }
 
         inferenceRequest->emplaceInputTensor(t.name, std::move(t.tensor));
+        std::printf(">>> Parsed config with name %s\n", t.name.c_str());
     }
 
     bool streamingFlag = utils::getRequestBooleanInputTensor(request, kStreamingInputTensorName);
@@ -143,6 +145,16 @@ std::shared_ptr<tensorrt_llm::batch_manager::InferenceRequest> WorkItem::createI
             "Streaming is only supported if model is "
             "deployed using decoupled mode.");
     }
+
+    // todo: check gpt_model_type is inflight_fused_batching or not, only inflight_fused_batching support logits processor
+    // todo: mange lp_ptr_ to avoid memory leak
+    int strategies[MaxStrategyNums] = {1, 1, 1,0};
+    auto _token_ids =  new int[5]{1,2,3,4,5};
+    auto _scales = new float[5]{0.1,0.2,0.13,0.12,0.11};
+
+    auto lp_ptr_ = new LogitsProcessorStrategy(strategies);
+    lp_ptr_->setTokenSuppressData(_token_ids, _scales, 5);
+    lp_ptr_->setLogitsProcessor(inferenceRequest);
 
     return inferenceRequest;
 }
